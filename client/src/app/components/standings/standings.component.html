@@ -1,0 +1,67 @@
+<div class="standings-container">
+  <h1>2024-2025 NBA Regular Season Standings</h1>
+  
+  <div *ngIf="loading" class="loading">Loading standings...</div>
+  
+  <div *ngIf="error" class="error">{{ error }}</div>
+  
+  <div *ngIf="!loading && !error" class="conferences">
+    <!-- Eastern Conference -->
+    <div class="conference">
+      <h2>Eastern Conference</h2>
+      <table class="standings-table">
+        <thead>
+          <tr>
+            <th>Team</th>
+            <th>W</th>
+            <th>L</th>
+            <th>Win%</th>
+            <th>GB</th>
+            <th>Streak</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let team of easternConference">
+            <td class="team-cell">
+              <img [src]="team.team.logo" [alt]="team.team.name" class="team-logo">
+            </td>
+            <td>{{ team.wins }}</td>
+            <td>{{ team.losses }}</td>
+            <td>{{ team.winPercentage.toFixed(3) }}</td>
+            <td>{{ team.gamesBack }}</td>
+            <td>{{ team.streak }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Western Conference -->
+    <div class="conference">
+      <h2>Western Conference</h2>
+      <table class="standings-table">
+        <thead>
+          <tr>
+            <th>Team</th>
+            <th>W</th>
+            <th>L</th>
+            <th>Win%</th>
+            <th>GB</th>
+            <th>Streak</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let team of westernConference">
+            <td class="team-cell">
+              <img [src]="team.team.logo" [alt]="team.team.name" class="team-logo">
+            </td>
+            <td>{{ team.wins }}</td>
+            <td>{{ team.losses }}</td>
+            <td>{{ team.winPercentage.toFixed(3) }}</td>
+            <td>{{ team.gamesBack }}</td>
+            <td>{{ team.streak }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
