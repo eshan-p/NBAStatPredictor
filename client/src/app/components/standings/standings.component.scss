@@ -1,6 +1,6 @@
 .standings-container {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 650px;
   margin: 0 auto;
 
   h1 {
@@ -22,7 +22,7 @@
   .conferences {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    gap: 100px;
 
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
@@ -41,32 +41,43 @@
     width: 100%;
     border-collapse: collapse;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background-color: #ffffff49;
+    border-radius: 30px 30px 30px 30px;
 
     th, td {
-      padding: 12px 8px;
-      text-align: left;
-      border-bottom: 1px solid #dee2e6;
+      padding: 10px 8px;
+      text-align: center;
+      border: none;
+    }
+
+    th:not(:last-child), 
+    td:not(:last-child) {
+      border-right: solid 1px rgb(0, 0, 0);
     }
 
     th {
-      background-color: #f8f9fa;
       font-weight: 600;
-      color: #495057;
+      color: #000000;
+    }
+
+    tr {
+      border: none;
     }
 
     tbody tr:hover {
-      background-color: #f8f9fa;
+      background-color: #f8f9fa21;
     }
 
     .team-cell {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
     }
 
     .team-logo {
-      width: 24px;
-      height: 24px;
+      width: 30px;
+      height: 30px;
       object-fit: contain;
     }
   }

@@ -1,8 +1,11 @@
 <div class="app-container">
-  <nav class="navbar">
-    <h1>NBA App</h1>
+  <div class="topnav">
+    <a routerLink="/" routerLinkActive="active">Home</a>
     <a routerLink="/standings" routerLinkActive="active">Standings</a>
-  </nav>
+    <a routerLink="/boxscores" routerLinkActive="active">Box Scores</a>
+    <a routerLink="/teams" routerLinkActive="active">Teams</a>
+    <a routerLink="/players" routerLinkActive="active">Players</a>
+  </div>
   
   <main>
     <router-outlet></router-outlet>
