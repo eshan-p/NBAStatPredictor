@@ -1,0 +1,10 @@
+<div class="players-container">
+    <div *ngIf="loading" class="loading">Loading players...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+    <div *ngIf="!loading && !error" class="players-list">
+        <div class="player-card" *ngFor="let player of players">
+            <h3>{{ player.firstname }} {{ player.lastname }}</h3>
+            <p>Number: {{ player.leagues.standard.jersey }}</p>
+            <p>Position: {{ player.leagues.standard.pos }}</p>
+        </div>
+</div>

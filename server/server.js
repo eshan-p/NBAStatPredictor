@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const standingsRoutes = require('./routes/standings.js');
+const playerRoutes = require('./routes/players.js');
 
 require('dotenv').config();
 
@@ -15,8 +16,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/standings', standingsRoutes);
+app.use('/api/players', playerRoutes);
 
 const mongoose = require('mongoose');
+const Player = require('./models/Player.js');
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {

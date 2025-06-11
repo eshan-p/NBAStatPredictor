@@ -3,7 +3,6 @@ const axios = require('axios');
 
 require('dotenv').config();
 
-// Replace 'YOUR_RAPIDAPI_KEY_HERE' with your actual RapidAPI key
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = 'api-nba-v1.p.rapidapi.com';
 

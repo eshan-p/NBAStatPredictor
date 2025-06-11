@@ -1,0 +1,42 @@
+.players-container {
+    padding: 20px;
+    max-width: 1250px;
+    margin: 0 auto;
+
+    .loading, .error {
+        text-align: center;
+        padding: 20px;
+        font-size: 18px;
+    }
+    .error {
+        color: #dc3545;
+    }
+    .players-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+        }
+
+        .player-card {
+            background-color: #ffffff49;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: left;
+
+            h3 {
+                margin: 0 0 5px;
+                font-size: 18px;
+                color: #000000;
+            }
+
+            p {
+                margin: 5px 0;
+                color: #000000;
+            }
+        }
+    }
+}
