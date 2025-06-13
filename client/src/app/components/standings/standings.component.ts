@@ -26,8 +26,8 @@ export class StandingsComponent implements OnInit {
     this.standingsService.getStandings().subscribe({
       next: (data) => {
         this.standings = data;
-        this.easternConference = data.filter(team => team.conference === 'east');
-        this.westernConference = data.filter(team => team.conference === 'west');
+        this.easternConference = data.filter(team => team.conference.name === 'east');
+        this.westernConference = data.filter(team => team.conference.name === 'west');
         this.loading = false;
       },
       error: (error) => {

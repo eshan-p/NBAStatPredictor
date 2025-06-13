@@ -16,6 +16,7 @@
             <th>Team</th>
             <th>Record</th>
             <th>Win%</th>
+            <th>Loss%</th>
             <th>Streak</th>
           </tr>
         </thead>
@@ -24,8 +25,9 @@
             <td class="team-cell">
               <img [src]="team.team.logo" [alt]="team.team.name" class="team-logo">
             </td>
-            <td>{{ team.wins }}-{{ team.losses }}</td>
-            <td>{{ team.winPercentage.toFixed(3) }}</td>
+            <td>{{ team.conference.win }}-{{ team.conference.loss }}</td>
+            <td>{{ team.win.percentage }}</td>
+            <td>{{ team.loss.percentage }}</td>
             <td>{{ team.streak }}</td>
           </tr>
           <tr>
@@ -47,6 +49,7 @@
             <th>Team</th>
             <th>Record</th>
             <th>Win%</th>
+            <th>Loss%</th>
             <th>Streak</th>
           </tr>
         </thead>
@@ -55,8 +58,9 @@
             <td class="team-cell">
               <img [src]="team.team.logo" [alt]="team.team.name" class="team-logo">
             </td>
-            <td>{{ team.wins }}-{{ team.losses }}</td>
-            <td>{{ team.winPercentage.toFixed(3) }}</td>
+            <td>{{ team.conference.win }}-{{ team.conference.loss }}</td>
+            <td>{{ team.win.percentage }}</td>
+            <td>{{ team.loss.percentage }}</td>
             <td>{{ team.streak }}</td>
           </tr>
           <tr>

@@ -31,18 +31,47 @@ exports.getStandings = async (req, res) => {
 
     // Transform the API response to match our schema
     const standings = standingsResponse.data.response.map(standing => ({
+      league: standing.league,
+      season: standing.season,
       team: {
+        id: standing.team.id,
         name: standing.team.name,
-        abbreviation: standing.team.code,
+        nickname: standing.team.nickname,
+        code: standing.team.code,
         logo: standing.team.logo
       },
-      conference: standing.conference.name,
-      division: standing.division.name,
-      wins: standing.win.total,
-      losses: standing.loss.total,
-      winPercentage: parseFloat(standing.win.percentage) || 0,
-      gamesBack: standing.gamesBehind || '0',
-      streak: standing.streak > 0 ? `W${standing.streak}` : `L${Math.abs(standing.streak)}`
+      conference: {
+        name: standing.conference.name,
+        rank: standing.conference.rank,
+        win: standing.conference.win,
+        loss: standing.conference.loss
+      },
+      division: {
+        name: standing.division.name,
+        rank: standing.division.rank,
+        win: standing.division.win,
+        loss: standing.division.loss,
+        gamesBehind: standing.gamesBehind || '0'
+      },
+      win: {
+        home: standing.win.home,
+        away: standing.win.away,
+        total: standing.win.total,
+        percentage: standing.win.percentage,
+        lastTen: standing.win.lastTen
+      },
+      loss: {
+        home: standing.loss.home,
+        away: standing.loss.away,
+        total: standing.loss.total,
+        percentage: standing.loss.percentage,
+        lastTen: standing.loss.lastTen
+      },
+      gamesBehind: standing.gamesBehind || '0',
+      streak: standing.streak,
+      winStreak: standing.winStreak,
+      //tieBreakerPoints: null, // Assuming this is not provided by the API
+      lastUpdated: new Date()
     }));
 
     // Clear old data and save new data
