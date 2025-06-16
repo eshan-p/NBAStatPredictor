@@ -1,16 +1,18 @@
 const Standing = require('../models/Standing');
 const axios = require('axios');
 
+// Load environment variables
 require('dotenv').config();
-
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = 'api-nba-v1.p.rapidapi.com';
 
+const ONE_WEEK = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
+
 exports.getStandings = async (req, res) => {
   try {
-    // Check if we have recent data (within last 4 hours)
+    // Check if we have recent data (within last 1 week)
     const recentStandings = await Standing.find({
-      lastUpdated: { $gte: new Date(Date.now() - 14400000) }
+      lastUpdated: { $gte: new Date(Date.now() - ONE_WEEK) }
     }).sort({ conference: 1, winPercentage: -1 });
 
     if (recentStandings.length > 0) {

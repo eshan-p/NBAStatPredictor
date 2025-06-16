@@ -5,7 +5,7 @@ const playerSchema = new mongoose.Schema({
     firstname: String,
     lastname: String,
     birth: {
-        date: Date,
+        date: String,
         country: String
     },
     nba: {
@@ -13,13 +13,13 @@ const playerSchema = new mongoose.Schema({
         pro: Number
     },
     height: {
-        feet: Number,
-        inches: Number,
-        meters: Number
+        feet: String,
+        inches: String,
+        meters: String
     },
     weight: {
-        pounds: Number,
-        kilograms: Number
+        pounds: String,
+        kilograms: String
     },
     college: String,
     affiliation: String,

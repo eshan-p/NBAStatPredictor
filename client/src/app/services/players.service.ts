@@ -7,7 +7,7 @@ export interface Player {
   firstname: string;
   lastname: string;
   birth: {
-    date: Date;
+    date: string;
     country: string;
   };
   nba: {
@@ -15,13 +15,13 @@ export interface Player {
     end: number;
   };
   height: {
-    feet: number;
-    inches: number;
-    meters: number;
+    feet: string;
+    inches: string;
+    meters: string;
   };
   weight: {
-    pounds: number;
-    kilograms: number;
+    pounds: string;
+    kilograms: string;
   };
   college: string;
   affiliation: string;
