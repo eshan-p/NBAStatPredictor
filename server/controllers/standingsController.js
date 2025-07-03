@@ -23,7 +23,7 @@ exports.getStandings = async (req, res) => {
     const standingsResponse = await axios.get('https://api-nba-v1.p.rapidapi.com/standings', {
       params: {
         league: 'standard',
-        season: '2024'
+        season: '2022'
       },
       headers: {
         'X-RapidAPI-Key': RAPIDAPI_KEY,

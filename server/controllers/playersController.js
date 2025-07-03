@@ -16,6 +16,77 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms)); // Dela
 const TWELVE_HOURS = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 const ONE_WEEK = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
 
+// Rate limiting variables
+const MAX_REQUESTS_PER_MINUTE = 10;      // Maximum requests per minute
+const MAX_REQUESTS_PER_DAY = 100;        // Maximum requests per day
+const MINUTE_IN_MS = 60 * 1000;          // 1 minute in milliseconds
+const DAY_IN_MS = 24 * 60 * 60 * 1000;   // 1 day in milliseconds
+
+// Rate limiting trackers
+let requestsInLastMinute = [];
+let requestsInLastDay = [];
+
+// Function to check if we can make a request
+const canMakeRequest = () => {
+  const now = Date.now();
+
+  // Clean old requests from tracking arrays
+  requestsInLastMinute = requestsInLastMinute.filter(time => now - time < MINUTE_IN_MS);
+  requestsInLastDay = requestsInLastDay.filter(time => now - time < DAY_IN_MS);
+
+  return requestsInLastMinute.length < MAX_REQUESTS_PER_MINUTE &&
+         requestsInLastDay.length < MAX_REQUESTS_PER_DAY;
+};
+
+// Function to record a request
+const recordRequest = () => {
+  const now = Date.now();
+  requestsInLastMinute.push(now);
+  requestsInLastDay.push(now);
+};
+
+// Function to calculate delay needed to respect rate limits
+const calculateDelay = () => {
+  if (requestsInLastMinute.length >= MAX_REQUESTS_PER_MINUTE) {
+    const oldestRequest = Math.min(...requestsInLastMinute);
+    return MINUTE_IN_MS - (Date.now() - oldestRequest) + 1000; // Add 1 second buffer
+  }
+  return 6000; // Default to 6 seconds if under limit
+};
+
+// Function to fetch player stats from NBA API
+const fetchPlayerStats = async (playerId) => {
+  try {
+    if (!canMakeRequest()) {
+      const delayTime = calculateDelay();
+      console.log(`Rate limit reached, waiting for ${delayTime} ms`);
+      await delay(delayTime);
+    }
+
+    recordRequest();
+
+    const statsResponse = await axios.get(
+      "https://api-nba-v1.p.rapidapi.com/players/statistics",
+      {
+        params: {
+          id: playerId,
+          season: "2024",
+        },
+        headers: {
+          "X-RapidAPI-Key": RAPIDAPI_KEY,
+          "X-RapidAPI-Host": RAPIDAPI_HOST,
+        },
+      }
+    );
+
+    return statsResponse.data?.response || [];
+  } catch (error) {
+    console.error(`Error fetching player stats for ${playerId}:`, error.message);
+    return null;
+  }
+};
+
+// Function to get players from the database or API      
 exports.getPlayers = async (req, res) => {
   try {
     // Check if we have recent data (within last 1 week)
@@ -31,10 +102,21 @@ exports.getPlayers = async (req, res) => {
     }
 
     let allPlayers = [];
+    let totalRequestsMade = 0;
 
     // Fetch current season players from RapidAPI NBA
     for (const teamId of teamIds) {
       try {
+        // Check if we can make a request based on rate limits
+        if (!canMakeRequest()) {
+          const delayTime = calculateDelay();
+          console.log(`Rate limit reached, waiting for ${delayTime} ms`);
+          await delay(delayTime);
+        }
+
+        recordRequest();
+        totalRequestsMade++;
+
         const playersResponse = await axios.get(
           "https://api-nba-v1.p.rapidapi.com/players",
           {
@@ -50,7 +132,56 @@ exports.getPlayers = async (req, res) => {
         );
 
         if (playersResponse.data && playersResponse.data.response) {
-          const players = playersResponse.data.response.map((player) => ({
+          const teamPlayers = [];
+
+          for (const player of playersResponse.data.response) {
+            // Check daily limit
+            if (requestsInLastDay.length >= MAX_REQUESTS_PER_DAY - 5) {
+              console.log(`Approaching daily limit, skipping remaining players`);
+              break;
+            }
+
+            // Fetch player stats
+            const playerStats = await fetchPlayerStats(player.id);
+            totalRequestsMade++;
+
+            const playerWithStats = {
+              id: player.id,
+              firstname: player.firstname,
+              lastname: player.lastname,
+              birth: {
+                date: player.birth?.date || null,
+                country: player.birth?.country || null,
+              },
+              nba: {
+                start: player.nba?.start || null,
+                pro: player.nba?.pro || null,
+              },
+              height: {
+                feet: player.height?.feet || null,
+                inches: player.height?.inches || null,
+                meters: player.height?.meters || null,
+              },
+              weight: {
+                pounds: player.weight?.pounds || null,
+                kilograms: player.weight?.kilograms || null,
+              },
+              college: player.college || null,
+              affiliation: player.affiliation || null,
+              leagues: {
+                standard: {
+                  jersey: player.leagues?.standard?.jersey || null,
+                  active: player.leagues?.standard?.active || null,
+                  pos: player.leagues?.standard?.pos || null,
+                },
+              },
+              stats: playerStats,
+              lastUpdated: new Date(), // Set last updated time
+            };
+
+            teamPlayers.push(playerWithStats);
+          }
+          /*const players = playersResponse.data.response.map((player) => ({
             id: player.id,
             firstname: player.firstname,
             lastname: player.lastname,
@@ -81,11 +212,12 @@ exports.getPlayers = async (req, res) => {
               },
             },
             lastUpdated: new Date(), // Set last updated time
-          }));
+          }));*/
 
-          allPlayers.push(...players);
+          allPlayers.push(...teamPlayers);
           const teamName = playersResponse.data.response?.[0]?.team?.name || `teamId ${teamId}`;
-          console.log(`Fetched ${players.length} players for ${teamName}`);
+          console.log(`Fetched ${teamPlayers.length} players with stats for ${teamName}`);
+          console.log(`Total API requests made: ${totalRequestsMade}`);
 
         } else {
           const teamName = playersResponse.data.response?.[0]?.team?.name || `teamId ${teamId}`;
@@ -98,9 +230,17 @@ exports.getPlayers = async (req, res) => {
         );
       }
 
+      // Check if we are approaching the daily limit for API requests
+      if (requestsInLastDay.length >= MAX_REQUESTS_PER_DAY - 10) {
+        console.log(`Approaching daily API request limit (${MAX_REQUESTS_PER_DAY - requestsInLastDay.length}) remaining, stopping early`);
+        break;
+      }
+
       // Delay between requests
-      await delay(6500); // 6.5 second delay to avoid hitting rate limits
+      await delay(calculateDelay());
     }
+
+    console.log(`Processed ${allPlayers.length} players in total, made ${totalRequestsMade} API requests`);
 
     // Clear old data and save new data in MongoDB
     await Player.deleteMany({});

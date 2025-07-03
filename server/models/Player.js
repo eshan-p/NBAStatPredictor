@@ -30,6 +30,7 @@ const playerSchema = new mongoose.Schema({
             pos: String
         }
     },
+    stats: Array,
     lastUpdated: {
         type: Date,
         default: Date.now
